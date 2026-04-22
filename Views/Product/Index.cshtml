@@ -1,0 +1,65 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model IEnumerable<TechStore.Models.Product>
+@{
+    ViewData["Title"] = "Products";
+}
+<h2 class="mb-3">Products</h2>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-5">
+        <input type="text" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control" placeholder="Search products..." />
+    </div>
+    <div class="col-md-4">
+        <select class="form-select" name="categoryId">
+            <option value="">All categories</option>
+            @foreach (var c in (List<SelectListItem>)ViewBag.Categories)
+            {
+                <option value="@c.Value" selected="@(ViewBag.CategoryId?.ToString()==c.Value)">
+                    @c.Text
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3 text-end">
+        <button class="btn btn-secondary">Search</button>
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <a asp-action="Create" class="btn btn-primary">Add Product</a>
+        }
+    </div>
+</form>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td style="width:80px">
+                    <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/images/products/no-image.png" : p.ImageUrl)" class="img-thumbnail" style="width:70px;height:70px;object-fit:cover" />
+                </td>
+                <td>@p.Name</td>
+                <td>@p.Category?.Name</td>
+                <td>@p.Price.ToString("0.00")</td>
+                <td>@(p.IsActive ? "Active" : "Inactive")</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@p.Id" class="btn btn-outline-secondary btn-sm">Details</a>
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@p.Id" class="btn btn-danger btn-sm">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
